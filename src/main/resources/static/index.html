@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.0/css/bootstrap.min.css"
+	integrity="sha384-PDle/QlgIONtM1aqA2Qemk5gPOE7wFq8+Em+G/hmo5Iq0CCmYZLv3fVRDJ4MMwEA"
+	crossorigin="anonymous">
+
+<style>
+pre {
+	background: #454d55;
+	color: #fff;
+	padding: 1em;
+	margin: .5em 0;
+	font-size: .75rem;
+}
+
+#authenticator-table tr>td:hover {
+	cursor: pointer;
+}
+</style>
+<script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+<script type="text/javascript">
+	$.ajaxSetup({
+		beforeSend : function(xhr, settings) {
+			if (settings.type == 'POST' || settings.type == 'PUT'
+					|| settings.type == 'DELETE') {
+				if (!(/^http:.*/.test(settings.url) || /^https:.*/
+						.test(settings.url))) {
+					xhr.setRequestHeader("X-XSRF-TOKEN", Cookies
+							.get('XSRF-TOKEN'));
+				}
+			}
+		}
+	});
+	
+    $.get("/user", function(data) {
+        $("#name").html(data.userAuthentication.details.name);
+        $(".unauthenticated").hide()
+        $(".authenticated").show()
+    }).fail(function() {
+        $(".unauthenticated").show()
+        $(".authenticated").hide()
+    });
+
+    $.get("/userInfo", function(data) {
+        $("#user-info").html(data);
+        $(".unauthenticated").hide()
+        $(".authenticated").show()
+    }).fail(function() {
+        $(".unauthenticated").show()
+        $(".authenticated").hide()
+    });
+
+    var logout = function() {
+        $.post("/logout", function() {
+            $(".unauthenticated").show();
+            $(".authenticated").hide();
+        })
+        return true;
+    }
+</script>
+
+<title>Custom Java application using Authorization grant type</title>
+</head>
+
+<body>
+	<div class="col jumbotron">
+		<div class="container">
+			<h1>Java sample application</h1>
+			<p>This sample is created using Spring Boot!</p>
+		</div>
+	</div>
+	<div class="container authenticated" id="user">
+		<div class="mb-5 align-items-start">
+			<div class="mb-5">
+				<h3>User name:</h3>
+				<div class="d-block p-4 bg-dark text-white visible" id="name"></div>
+			</div>
+			<div>
+				<h3>User info:</h3>
+				<pre class="d-block p-4 bg-dark text-white visible" id="user-info"></pre>
+			</div>
+			<div>
+	       	 <button onClick="logout()">Logout</button>
+	     </div>
+		</div>
+	</div>
+	<div class="container unauthenticated">
+		<a href="/login" id="login">Login</a>
+	</div>
+</body>
+
+</html>
